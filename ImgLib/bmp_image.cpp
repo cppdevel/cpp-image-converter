@@ -9,9 +9,11 @@ using namespace std;
 
 namespace img_lib {
 
+static const std::array<uint8_t, 2> BPM_SIG{'B', 'M'};
+
 PACKED_STRUCT_BEGIN BitmapFileHeader {
     // поля заголовка Bitmap File Header
-    uint8_t signature[2]{'B', 'M'}; // подпись
+    std::array<uint8_t, 2> signature{'B', 'M'}; // подпись
     uint32_t size = 0; // суммарный размер заголовка и данных
     uint32_t reserve = 0; // зарезервированное пространство
     uint32_t indent = 54; // отступ данных от начала файла
@@ -41,6 +43,9 @@ static int GetBMPStride(int w) {
 
 bool SaveBMP(const Path& file, const Image& image) {
     ofstream out(file, ios::binary);
+    if (!out) {
+        return false;
+    }
 
     const int width = image.GetWidth();
     const int height = image.GetHeight();
@@ -77,8 +82,14 @@ Image LoadBMP(const Path& file) {
     BitmapInfoHeader info_header;
 
     ifstream ifs(file, ios::binary);
+    if (!ifs) {
+        return {};
+    }
     ifs.read(reinterpret_cast<char*>(&file_header), sizeof(BitmapFileHeader));
     ifs.read(reinterpret_cast<char*>(&info_header), sizeof(BitmapInfoHeader));
+    if (file_header.signature != BPM_SIG) {
+        return {};
+    }
 
     const int width = info_header.width;
     const int height = info_header.height;
