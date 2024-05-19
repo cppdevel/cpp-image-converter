@@ -9,11 +9,11 @@ using namespace std;
 
 namespace img_lib {
 
-static const std::array<uint8_t, 2> BPM_SIG{'B', 'M'};
+static const std::array<uint8_t, 2> BMP_SIG{ 'B', 'M' };
 
 PACKED_STRUCT_BEGIN BitmapFileHeader {
     // поля заголовка Bitmap File Header
-    std::array<uint8_t, 2> signature{'B', 'M'}; // подпись
+    std::array<uint8_t, 2> signature{ 'B', 'M' }; // подпись
     uint32_t size = 0; // суммарный размер заголовка и данных
     uint32_t reserve = 0; // зарезервированное пространство
     uint32_t indent = 54; // отступ данных от начала файла
@@ -87,7 +87,7 @@ Image LoadBMP(const Path& file) {
     }
     ifs.read(reinterpret_cast<char*>(&file_header), sizeof(BitmapFileHeader));
     ifs.read(reinterpret_cast<char*>(&info_header), sizeof(BitmapInfoHeader));
-    if (file_header.signature != BPM_SIG) {
+    if (file_header.signature != BMP_SIG) {
         return {};
     }
 
